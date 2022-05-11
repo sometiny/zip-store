@@ -50,15 +50,16 @@ class ZipStore
         $base = ltrim(rtrim($base, '/\\') . '/', '/');
         self::addDirectoryPrivate($dir, $base);
     }
+
     private function addDirectoryPrivate(string $dir, string $base)
     {
         $handle = @opendir($dir);
         if (!$handle) throw new \Exception('can not open directory');
         try {
-            while(($name = @readdir($handle)) !== false) {
+            while (($name = @readdir($handle)) !== false) {
                 if ($name === '.' || $name === '..') continue;
                 $fullPath = $dir . DIRECTORY_SEPARATOR . $name;
-                if(is_file($fullPath)){
+                if (is_file($fullPath)) {
                     $this->addFile($fullPath, $base . $name);
                     continue;
                 }
@@ -99,12 +100,10 @@ class ZipStore
             $size = 0;
             foreach ($entities as $entity) {
                 $entity->setOffset($offset);
-                $entity->writeTo($output);
-                $offset += $entity->getLocalEntitySize();
+                $offset += $entity->writeTo($output);
             }
             foreach ($entities as $entity) {
-                fwrite($output, $entity->getCentralFileHeader());
-                $size += $entity->getCentralEntitySize();
+                $size += $entity->writeCentralDirectoryHeader($output);
             }
 
             fwrite($output, pack('NvvvvVVv', 0x504b0506,

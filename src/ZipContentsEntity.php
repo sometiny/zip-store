@@ -11,7 +11,7 @@ class ZipContentsEntity extends ZipEntityAbstract
      * @param string $name
      * @throws \Exception
      */
-    public function __construct($contents, $name)
+    public function __construct(string $contents, string $name)
     {
 
         $this->setFileName($name);
@@ -26,10 +26,14 @@ class ZipContentsEntity extends ZipEntityAbstract
         $this->contents = $contents;
     }
 
-    public function writeTo($output)
+    /**
+     * @param $output
+     * @return int
+     */
+    public function writeTo($output): int
     {
         $this->setCrc32(crc32($this->contents));
-        $this->writeFileHeader($output);
+        $size = $this->writeLocalEntityHeader($output);
 
         $totalSize = $this->getUncompressedSize();
         while ($totalSize > 0) {
@@ -37,5 +41,6 @@ class ZipContentsEntity extends ZipEntityAbstract
 
             $totalSize -= $sent;
         }
+        return $size;
     }
 }

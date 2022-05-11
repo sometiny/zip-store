@@ -28,18 +28,18 @@ abstract class ZipEntityAbstract
     private $file;
 
     /**
-     * @return string|string[]
+     * @return string
      */
-    public function getFileName()
+    public function getFileName(): string
     {
         return $this->fileName;
     }
 
     /**
-     * @param string|string[] $fileName
+     * @param string $fileName
      * @throws \Exception
      */
-    public function setFileName($fileName)
+    public function setFileName(string $fileName)
     {
 
         /**
@@ -74,33 +74,33 @@ abstract class ZipEntityAbstract
     }
 
     /**
-     * @return false|int
+     * @return int
      */
-    public function getUncompressedSize()
+    public function getUncompressedSize(): int
     {
         return $this->uncompressedSize;
     }
 
     /**
-     * @param false|int $uncompressedSize
+     * @param int $uncompressedSize
      */
-    public function setUncompressedSize($uncompressedSize)
+    public function setUncompressedSize(int $uncompressedSize)
     {
         $this->uncompressedSize = $uncompressedSize;
     }
 
     /**
-     * @return false|int
+     * @return int
      */
-    public function getCompressedSize()
+    public function getCompressedSize(): int
     {
         return $this->compressedSize;
     }
 
     /**
-     * @param false|int $compressedSize
+     * @param int $compressedSize
      */
-    public function setCompressedSize($compressedSize)
+    public function setCompressedSize(int $compressedSize)
     {
         $this->compressedSize = $compressedSize;
     }
@@ -132,13 +132,13 @@ abstract class ZipEntityAbstract
         $this->extraFieldLength = strlen($this->extraField);
     }
 
-    public function getLastModifyDateString()
+    public function getLastModifyDateString(): string
     {
         $dt = $this->lastModifyDate;
         return sprintf('%u-%02u-%02u', 1980 + (($dt >> 9) & 0X7F), ($dt >> 5) & 0XF, $dt & 0X1F);
     }
 
-    public function getLastModifyTimeString()
+    public function getLastModifyTimeString(): string
     {
         $dt = $this->lastModifyTime;
         return sprintf('%02u:%02u:%02u', ($dt >> 11) & 0X1F, ($dt >> 5) & 0X3F, ($dt & 0X1F) * 2);
@@ -191,7 +191,8 @@ abstract class ZipEntityAbstract
         $this->setLastModifyDate($time);
         $this->setLastModifyTime($time);
     }
-    public function getLastModify()
+
+    public function getLastModify(): string
     {
         return $this->getLastModifyDateString() . ' ' . $this->getLastModifyTimeString();
     }
@@ -204,7 +205,11 @@ abstract class ZipEntityAbstract
         $this->offset = $offset;
     }
 
-    public function getLocalFileHeader()
+    /**
+     * get local entity header
+     * @return string
+     */
+    public function getLocalEntityHeader(): string
     {
         return pack('NvvvvvVVVvv', 0x504b0304,
                 $this->decompressVersion,
@@ -219,12 +224,20 @@ abstract class ZipEntityAbstract
                 $this->extraFieldLength) . $this->fileName . $this->extraField;
     }
 
-    public function getLocalEntitySize()
+    /**
+     * get local entity header size
+     * @return int
+     */
+    public function getLocalEntitySize(): int
     {
-        return 30 + strlen($this->fileName) + $this->uncompressedSize + $this->extraFieldLength;
+        return 30 + strlen($this->fileName) + $this->compressedSize + $this->extraFieldLength;
     }
 
-    public function getCentralFileHeader()
+    /**
+     * get central directory header
+     * @return string
+     */
+    public function getCentralDirectoryHeader(): string
     {
         return pack('NvvvvvvVVVvvvvvVV', 0x504b0102,
                 $this->compressVersion,
@@ -245,13 +258,35 @@ abstract class ZipEntityAbstract
                 $this->offset) . $this->fileName . $this->extraField . $this->fileComment;
     }
 
-    public function getCentralEntitySize()
+    /**
+     * get central directory header size
+     * @return int central directory header size
+     */
+    public function getCentralDirectoryHeaderSize(): int
     {
         return 46 + strlen($this->fileName) + $this->extraFieldLength + $this->fileCommentLength;
     }
 
-    protected function writeFileHeader($output){
-        fwrite($output, $this->getLocalFileHeader());
+    /**
+     * write local entity header
+     * @param $output
+     * @return int local entity size, include data
+     */
+    public function writeLocalEntityHeader($output): int
+    {
+        fwrite($output, $this->getLocalEntityHeader());
+        return $this->getLocalEntitySize();
+    }
+
+    /**
+     * write central directory header
+     * @param $output
+     * @return int central directory header size
+     */
+    public function writeCentralDirectoryHeader($output): int
+    {
+        fwrite($output, $this->getCentralDirectoryHeader());
+        return $this->getCentralDirectoryHeaderSize();
     }
 
     /**
@@ -261,5 +296,5 @@ abstract class ZipEntityAbstract
      * @param $output
      * @return mixed
      */
-    public abstract function writeTo($output);
+    public abstract function writeTo($output): int;
 }
