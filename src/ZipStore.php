@@ -16,7 +16,7 @@ class ZipStore
     /**
      * @param string $file
      * @param string|null $name
-     * @return ZipEntity
+     * @return ZipEntityAbstract
      * @throws \Exception
      */
     public function addFile(string $file, string $name = null)
@@ -29,7 +29,7 @@ class ZipStore
     /**
      * @param string $contents
      * @param string $name
-     * @return ZipEntity
+     * @return ZipEntityAbstract
      * @throws \Exception
      */
     public function addContents(string $contents, string $name)
@@ -47,10 +47,10 @@ class ZipStore
     public function addDirectory(string $dir, $base = '')
     {
         $dir = rtrim($dir, '/\\');
-        $handle = opendir($dir);
+        $handle = @opendir($dir);
         if (!$handle) throw new \Exception('can not open directory');
         try {
-            while(($name = readdir($handle)) !== false) {
+            while(($name = @readdir($handle)) !== false) {
                 if ($name === '.' || $name === '..') continue;
                 $fullPath = $dir . DIRECTORY_SEPARATOR . $name;
                 if(is_file($fullPath)){
