@@ -50,15 +50,21 @@ class ZipStore
         $base = ltrim(rtrim($base, '/\\') . '/', '/');
         self::addDirectoryPrivate($dir, $base);
     }
+
+    /**
+     * @param string $dir
+     * @param string $base
+     * @throws \Exception
+     */
     private function addDirectoryPrivate(string $dir, string $base)
     {
         $handle = @opendir($dir);
         if (!$handle) throw new \Exception('can not open directory');
         try {
-            while(($name = @readdir($handle)) !== false) {
+            while (($name = @readdir($handle)) !== false) {
                 if ($name === '.' || $name === '..') continue;
                 $fullPath = $dir . DIRECTORY_SEPARATOR . $name;
-                if(is_file($fullPath)){
+                if (is_file($fullPath)) {
                     $this->addFile($fullPath, $base . $name);
                     continue;
                 }
