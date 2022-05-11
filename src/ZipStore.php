@@ -4,7 +4,7 @@ namespace Jazor\Zip\Store;
 class ZipStore
 {
 
-    private array $entities = [];
+    private $entities = [];
 
     /**
      * ZipStore constructor.
@@ -39,7 +39,7 @@ class ZipStore
      * @return ZipStore
      * @throws \Exception
      */
-    public function addDirectory(string $dir, ?string $base = ''): ZipStore
+    public function addDirectory(string $dir, $base = ''): ZipStore
     {
         $dir = rtrim($dir, '/\\');
         $handle = opendir($dir);

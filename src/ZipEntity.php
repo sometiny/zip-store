@@ -3,25 +3,25 @@ namespace Jazor\Zip\Store;
 
 class ZipEntity
 {
-    private int $compressVersion = 0x031e;
-    private int $decompressVersion = 0xa;
-    private int $flag = 0;
-    private int $compressionMethod = 0;
-    private int $lastModifyTime = 0;
-    private int $lastModifyDate = 0;
-    private int $crc32 = 0;
-    private int $compressedSize = 0;
-    private int $uncompressedSize = 0;
-    private int $fileNameLength = 0;
-    private int $extraFieldLength = 0;
-    private int $fileCommentLength = 0;
-    private int $diskNumberStart = 0;
-    private int $internalFileAttributes = 0;
-    private int $externalFileAttributes = 0;
-    private int $offset = 0;
-    private string $fileName = '';
-    private string $extraField = '';
-    private string $fileComment = '';
+    private $compressVersion = 0x031e;
+    private $decompressVersion = 0xa;
+    private $flag = 0;
+    private $compressionMethod = 0;
+    private $lastModifyTime = 0;
+    private $lastModifyDate = 0;
+    private $crc32 = 0;
+    private $compressedSize = 0;
+    private $uncompressedSize = 0;
+    private $fileNameLength = 0;
+    private $extraFieldLength = 0;
+    private $fileCommentLength = 0;
+    private $diskNumberStart = 0;
+    private $internalFileAttributes = 0;
+    private $externalFileAttributes = 0;
+    private $offset = 0;
+    private $fileName = '';
+    private $extraField = '';
+    private $fileComment = '';
     /**
      * @var null
      */
@@ -108,7 +108,7 @@ class ZipEntity
     /**
      * @param int $time
      */
-    public function setLastModifyTime(int $time): void
+    public function setLastModifyTime(int $time)
     {
         $hour = intval(date('G', $time));
         $minute = intval(ltrim(date('i', $time), '0'));
@@ -120,7 +120,7 @@ class ZipEntity
     /**
      * @param int $time
      */
-    public function setLastModifyDate(int $time): void
+    public function setLastModifyDate(int $time)
     {
         $year = intval(date('Y', $time)) - 1980;
         $month = intval(date('n', $time));
@@ -137,7 +137,7 @@ class ZipEntity
     /**
      * @param int $offset
      */
-    public function setOffset(int $offset): void
+    public function setOffset(int $offset)
     {
         $this->offset = $offset;
     }
