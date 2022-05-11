@@ -15,7 +15,7 @@ try {
     $zip->addFile("{$base}你好.txt", 'files/你好.txt');
 
     //directory with base name
-    $zip->addDirectory("{$base}files", 'extra-files/');
+    $zip->addDirectory("{$base}files", 'extra-files');
 
     //raw contents
     $zip->addContents('i am hello world!', 'my name.jpg');

@@ -47,6 +47,11 @@ class ZipStore
     public function addDirectory(string $dir, $base = '')
     {
         $dir = rtrim($dir, '/\\');
+        $base = ltrim(rtrim($base, '/\\') . '/', '/');
+        self::addDirectoryPrivate($dir, $base);
+    }
+    private function addDirectoryPrivate(string $dir, string $base)
+    {
         $handle = @opendir($dir);
         if (!$handle) throw new \Exception('can not open directory');
         try {
