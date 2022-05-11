@@ -68,7 +68,7 @@ class ZipStore
     public function send($downloadFileName)
     {
         header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment;filename="' . $downloadFileName . '"');
+        header('Content-Disposition: attachment; filename*=UTF-8\'\'' . $downloadFileName);
         $this->save('php://output');
     }
 

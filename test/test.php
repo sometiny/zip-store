@@ -24,9 +24,8 @@ try {
     //directory with base name
     $zip->addDirectory("{$base}files", 'extra-files/');
 
-    $zip->save("{$base}dest.zip");
-
-//$zip->send('a.zip');
+    //$zip->save("{$base}dest.zip");
+    $zip->send('a.zip');
 }catch (\Exception $e) {
     echo $e->getMessage();
 }
