@@ -1,0 +1,24 @@
+{
+    "name": "jazor/zip-store",
+    "type": "library",
+    "description": "zip store for php",
+    "keywords": ["zip","store"],
+    "homepage": "https://github.com/cook-code-jazor/zip-store",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "anlige",
+            "email": "zhanghuiguoanlige@126.com",
+            "homepage": "https://github.com/cook-code-jazor/zip-store"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Jazor\\Zip\\Store\\": "./src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
