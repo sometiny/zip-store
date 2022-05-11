@@ -1,13 +1,6 @@
 <?php
 include_once '../autoload.php';
-header('content-type:text/plain');
 use Jazor\Zip\Store\ZipStore;
-use Jazor\Zip\Store\ZipEntity;
-
-
-/**
- * @var ZipEntity $entity;
- */
 
 $base = __DIR__ . DIRECTORY_SEPARATOR;
 
@@ -23,6 +16,9 @@ try {
 
     //directory with base name
     $zip->addDirectory("{$base}files", 'extra-files/');
+
+    //raw contents
+    $zip->addContents('i am hello world!', 'my name.jpg');
 
     //$zip->save("{$base}dest.zip");
     $zip->send('a.zip');

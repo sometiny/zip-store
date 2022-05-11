@@ -1,7 +1,7 @@
 <?php
 namespace Jazor\Zip\Store;
 
-class ZipEntity
+abstract class ZipEntityAbstract
 {
     private $compressVersion = 0x031e;
     private $decompressVersion = 0xa;
@@ -28,40 +28,97 @@ class ZipEntity
     private $file;
 
     /**
-     * ZipEntity constructor.
-     * @param null $file
-     * @param null $name
+     * @return string|string[]
+     */
+    public function getFileName()
+    {
+        return $this->fileName;
+    }
+
+    /**
+     * @param string|string[] $fileName
      * @throws \Exception
      */
-    public function __construct($file = null, $name = null)
+    public function setFileName($fileName)
     {
-        if (empty($file)) return;
-        if (!is_file($file)) throw new \Exception(sprintf('file \'%s\' not found.', $file));
 
-        if (empty($name)) {
-            $pos = strrpos($file, DIRECTORY_SEPARATOR);
-            if ($pos === false) throw new \Exception(sprintf('file path \'%s\' error.', $file));
-            $name = substr($file, $pos + 1);
-        }
+        /**
+         * replace '\' with '/' and trim start '/'
+         */
+        $fileName = str_replace('\\', '/', $fileName);
+        $fileName = ltrim($fileName, '/');
 
-        $name = str_replace('\\', '/', $name);
+        $this->fileName = $fileName;
+        $this->fileNameLength = strlen($fileName);
 
-        $this->fileName = $name;
-        $this->fileNameLength = strlen($name);
-
-        if (strlen($name) != mb_strlen($name, 'utf-8')) {
+        if (!mb_check_encoding($fileName, 'ascii')) {
+            if (!mb_check_encoding($fileName, 'utf-8')) throw new \Exception('file name must be utf-8 encoding');
             $this->setUtf8EncodingFlag();
         }
+    }
 
-        $fileModifyTime = filemtime($file);
-        $fileSize = filesize($file);
+    /**
+     * @return int
+     */
+    public function getFileNameLength(): int
+    {
+        return $this->fileNameLength;
+    }
 
-        $this->uncompressedSize = $this->compressedSize = $fileSize;
+    /**
+     * @param int $fileNameLength
+     */
+    public function setFileNameLength(int $fileNameLength)
+    {
+        $this->fileNameLength = $fileNameLength;
+    }
 
-        $this->setLastModifyDate($fileModifyTime);
-        $this->setLastModifyTime($fileModifyTime);
+    /**
+     * @return false|int
+     */
+    public function getUncompressedSize()
+    {
+        return $this->uncompressedSize;
+    }
 
-        $this->file = $file;
+    /**
+     * @param false|int $uncompressedSize
+     */
+    public function setUncompressedSize($uncompressedSize)
+    {
+        $this->uncompressedSize = $uncompressedSize;
+    }
+
+    /**
+     * @return false|int
+     */
+    public function getCompressedSize()
+    {
+        return $this->compressedSize;
+    }
+
+    /**
+     * @param false|int $compressedSize
+     */
+    public function setCompressedSize($compressedSize)
+    {
+        $this->compressedSize = $compressedSize;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCrc32(): int
+    {
+        return $this->crc32;
+    }
+
+    /**
+     * @param int $crc32
+     */
+    public function setCrc32(int $crc32)
+    {
+        $this->crc32 = $crc32;
     }
 
     /**
@@ -129,6 +186,11 @@ class ZipEntity
         $this->lastModifyDate = (($year & 0X7F) << 9) | (($month & 0xf) << 5) | ($day & 0x1f);
     }
 
+    public function setLastModify(int $time)
+    {
+        $this->setLastModifyDate($time);
+        $this->setLastModifyTime($time);
+    }
     public function getLastModify()
     {
         return $this->getLastModifyDateString() . ' ' . $this->getLastModifyTimeString();
@@ -188,20 +250,16 @@ class ZipEntity
         return 46 + strlen($this->fileName) + $this->extraFieldLength + $this->fileCommentLength;
     }
 
-
-    public function writeTo($output)
-    {
-        $this->crc32 = unpack('N', hash_file('crc32b', $this->file, true))[1];
+    protected function writeFileHeader($output){
         fwrite($output, $this->getLocalFileHeader());
-
-        $input = fopen($this->file, 'rb');
-        if (!$input) throw new \Exception('can not open file for read: ' . $this->file);
-        try {
-            while (!feof($input)) {
-                fwrite($output, fread($input, 0x10000));
-            }
-        } finally {
-            fclose($input);
-        }
     }
+
+    /**
+     * write data to output
+     *
+     * output can be file resource or php://output, and so on
+     * @param $output
+     * @return mixed
+     */
+    public abstract function writeTo($output);
 }

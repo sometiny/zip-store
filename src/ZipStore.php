@@ -14,32 +14,37 @@ class ZipStore
     }
 
     /**
-     * @return array
+     * @param string $file
+     * @param string|null $name
+     * @return ZipEntity
+     * @throws \Exception
      */
-    public function getEntities(): array
+    public function addFile(string $file, string $name = null)
     {
-        return $this->entities;
+        $entity = new ZipFileEntity($file, $name);
+        $this->entities[] = $entity;
+        return $entity;
     }
 
     /**
-     * @param string $file
-     * @param string|null $name
-     * @return ZipStore
+     * @param string $contents
+     * @param string $name
+     * @return ZipEntity
      * @throws \Exception
      */
-    public function addFile(string $file, string $name = null): ZipStore
+    public function addContents(string $contents, string $name)
     {
-        $this->entities[] = new ZipEntity($file, $name);
-        return $this;
+        $entity = new ZipContentsEntity($contents, $name);
+        $this->entities[] = $entity;
+        return $entity;
     }
 
     /**
      * @param string $dir
      * @param string|null $base
-     * @return ZipStore
      * @throws \Exception
      */
-    public function addDirectory(string $dir, $base = ''): ZipStore
+    public function addDirectory(string $dir, $base = '')
     {
         $dir = rtrim($dir, '/\\');
         $handle = opendir($dir);
@@ -54,7 +59,6 @@ class ZipStore
                 }
                 $this->addDirectory($fullPath, $base . $name . '/');
             }
-            return $this;
         } finally {
             closedir($handle);
         }
@@ -80,7 +84,7 @@ class ZipStore
     public function save($dest)
     {
         /**
-         * @var ZipEntity $entity
+         * @var ZipEntityAbstract $entity
          */
         $output = fopen($dest, 'wb');
         if (!$output) throw new \Exception('can not open zip archive');
