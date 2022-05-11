@@ -3,7 +3,7 @@ namespace Jazor\Zip\Store;
 
 class ZipEntity
 {
-    private int $compressVersion = 0x3f;
+    private int $compressVersion = 0x031e;
     private int $decompressVersion = 0xa;
     private int $flag = 0;
     private int $compressionMethod = 0;
@@ -62,6 +62,17 @@ class ZipEntity
         $this->setLastModifyTime($fileModifyTime);
 
         $this->file = $file;
+    }
+
+    /**
+     * 0x5455, 0x7875
+     * @param int $id
+     * @param $data
+     */
+    private function addExtra(int $id, $data)
+    {
+        $this->extraField .= pack('vv', $id, strlen($data)) . $data;
+        $this->extraFieldLength = strlen($this->extraField);
     }
 
     public function getLastModifyDateString()
