@@ -1,6 +1,5 @@
 <?php
-include_once '../src/ZipStore.php';
-include_once '../src/ZipEntity.php';
+include_once '../autoload.php';
 header('content-type:text/plain');
 use Jazor\Zip\Store\ZipStore;
 use Jazor\Zip\Store\ZipEntity;
