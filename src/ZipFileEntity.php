@@ -6,7 +6,7 @@ class ZipFileEntity extends ZipEntityAbstract
     private $file = '';
 
     /**
-     * ZipEntity constructor.
+     * ZipFileEntity constructor.
      * @param null $file
      * @param null $name
      * @throws \Exception
@@ -36,10 +36,15 @@ class ZipFileEntity extends ZipEntityAbstract
         $this->file = $file;
     }
 
-    public function writeTo($output)
+    /**
+     * @param $output
+     * @return int
+     * @throws \Exception
+     */
+    public function writeTo($output): int
     {
         $this->setCrc32(unpack('N', hash_file('crc32b', $this->file, true))[1]);
-        $this->writeFileHeader($output);
+        $size = $this->writeLocalEntityHeader($output);
 
         $input = fopen($this->file, 'rb');
         if (!$input) throw new \Exception('can not open file for read: ' . $this->file);
@@ -47,6 +52,7 @@ class ZipFileEntity extends ZipEntityAbstract
             while (!feof($input)) {
                 fwrite($output, fread($input, 0x10000));
             }
+            return $size;
         } finally {
             fclose($input);
         }

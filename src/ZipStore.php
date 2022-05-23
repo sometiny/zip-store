@@ -51,11 +51,6 @@ class ZipStore
         self::addDirectoryPrivate($dir, $base);
     }
 
-    /**
-     * @param string $dir
-     * @param string $base
-     * @throws \Exception
-     */
     private function addDirectoryPrivate(string $dir, string $base)
     {
         $handle = @opendir($dir);
@@ -105,12 +100,10 @@ class ZipStore
             $size = 0;
             foreach ($entities as $entity) {
                 $entity->setOffset($offset);
-                $entity->writeTo($output);
-                $offset += $entity->getLocalEntitySize();
+                $offset += $entity->writeTo($output);
             }
             foreach ($entities as $entity) {
-                fwrite($output, $entity->getCentralFileHeader());
-                $size += $entity->getCentralEntitySize();
+                $size += $entity->writeCentralDirectoryHeader($output);
             }
 
             fwrite($output, pack('NvvvvVVv', 0x504b0506,
